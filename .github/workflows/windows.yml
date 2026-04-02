@@ -1,0 +1,34 @@
+name: Build Windows EXE
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Build executable
+        shell: cmd
+        run: cl /nologo /utf-8 /EHsc /std:c++17 /Fe:ScaleCollector.exe ScaleCollector.cpp
+
+      - name: Prepare artifact
+        shell: cmd
+        run: |
+          if not exist dist mkdir dist
+          copy /Y ScaleCollector.exe dist\ScaleCollector.exe
+          if exist config.ini.example copy /Y config.ini.example dist\config.ini.example
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ScaleCollector-windows
+          path: dist

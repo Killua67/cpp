@@ -1,0 +1,26 @@
+.claude/
+.DS_Store
+
+# Local runtime config
+config.ini
+
+# Build outputs
+build/
+out/
+bin/
+dist/
+cmake-build-*/
+CMakeFiles/
+compile_commands.json
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+*.pdb
+
+# Logs
+*.log

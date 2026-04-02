@@ -1,0 +1,13 @@
+# 复制为 config.ini 后按设备协议调整
+SerialPort=COM3
+BaudRate=9600
+DataBits=8
+StopBits=1
+Parity=NONE
+Timeout=1000
+FrameLength=16
+SignIndex=0
+ValueStart=1
+ValueEnd=6
+UnitStart=7
+UnitEnd=8
