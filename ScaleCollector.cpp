@@ -78,7 +78,7 @@ WeightInfo parseScaleData(const unsigned char* data, const ScaleConfig& cfg) {
 
     // 1. 校验数据长度
     if (strlen((char*)data) != cfg.frameLength) {
-        cerr << "❌ 数据长度错误" << endl;
+        cerr << "[ERROR] 数据长度错误" << endl;
         return info;
     }
 
@@ -102,7 +102,7 @@ WeightInfo parseScaleData(const unsigned char* data, const ScaleConfig& cfg) {
         info.unit = unitBuf;
         info.isValid = true;
     } catch (...) {
-        cerr << "❌ 数据解析失败" << endl;
+        cerr << "[ERROR] 数据解析失败" << endl;
     }
     return info;
 }
@@ -113,7 +113,7 @@ WeightInfo parseScaleData(const unsigned char* data, const ScaleConfig& cfg) {
 HANDLE initSerialWindows(const ScaleConfig& cfg) {
     HANDLE hSerial = CreateFileA(cfg.serialPort.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
     if (hSerial == INVALID_HANDLE_VALUE) {
-        cerr << "❌ Windows串口打开失败" << endl;
+        cerr << "[ERROR] Windows串口打开失败" << endl;
         return INVALID_HANDLE_VALUE;
     }
 
@@ -140,7 +140,7 @@ HANDLE initSerialWindows(const ScaleConfig& cfg) {
 int initSerialLinux(const ScaleConfig& cfg) {
     int fd = open(cfg.serialPort.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
     if (fd < 0) {
-        cerr << "❌ Linux串口打开失败: " << strerror(errno) << endl;
+        cerr << "[ERROR] Linux串口打开失败: " << strerror(errno) << endl;
         return -1;
     }
 
@@ -172,9 +172,14 @@ int initSerialLinux(const ScaleConfig& cfg) {
 
 // ====================== 4. 主程序 ======================
 int main() {
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
+
     // 1. 加载配置
     ScaleConfig cfg = loadConfig("config.ini");
-    cout << "✅ 配置加载完成，串口: " << cfg.serialPort << " 波特率: " << cfg.baudRate << endl;
+    cout << "[OK] 配置加载完成，串口: " << cfg.serialPort << " 波特率: " << cfg.baudRate << endl;
 
     // 2. 初始化串口
 #ifdef _WIN32
@@ -185,7 +190,7 @@ int main() {
     if (hSerial < 0) return -1;
 #endif
 
-    cout << "✅ 串口连接成功，开始实时读取称重数据..." << endl << endl;
+    cout << "[OK] 串口连接成功，开始实时读取称重数据..." << endl << endl;
 
     // 3. 循环读取数据
     unsigned char buffer[256] = {0};
@@ -201,7 +206,7 @@ int main() {
         if (bytesRead == cfg.frameLength) {
             WeightInfo info = parseScaleData(buffer, cfg);
             if (info.isValid) {
-                cout << "📊 实时重量: " << info.weight << " " << info.unit << endl;
+                cout << "实时重量: " << info.weight << " " << info.unit << endl;
             }
         }
         memset(buffer, 0, sizeof(buffer));
